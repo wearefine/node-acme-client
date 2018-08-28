@@ -269,6 +269,9 @@ class AcmeClient {
             const shasum = crypto.createHash('sha256').update(result);
             return helper.b64escape(shasum.digest('base64'));
         }
+        else if (challenge.type === 'tls-alpn-01') {
+            return result;
+        }
 
         throw new Error(`Unable to produce key authorization, unknown challenge type: ${challenge.type}`);
     }
@@ -282,7 +285,7 @@ class AcmeClient {
      * @returns {Promise}
      */
 
-    async verifyChallenge(authz, challenge) {
+    async verifyChallenge(authz, challenge, challengeKeyAuthorization) {
         if (!authz.url || !challenge.url) {
             throw new Error('Unable to verify ACME challenge, URL not found');
         }
@@ -291,14 +294,15 @@ class AcmeClient {
             throw new Error(`Unable to verify ACME challenge, unknown type: ${challenge.type}`);
         }
 
-        const keyAuthorization = await this.getChallengeKeyAuthorization(challenge);
+        // TODO Remove this since we will be providing the challenge token
+        // const keyAuthorization = await this.getChallengeKeyAuthorization(challenge);
 
         const verifyFn = async () => {
-            await verify[challenge.type](authz, challenge, keyAuthorization);
+            await verify[challenge.type](authz, challenge, challengeKeyAuthorization);
         };
 
-        debug('Waiting for ACME challenge verification', this.backoffOpts);
-        return helper.retry(verifyFn, this.backoffOpts);
+        // debug('Waiting for ACME challenge verification', this.backoffOpts);
+        // return helper.retry(verifyFn, this.backoffOpts);
     }
 
 
@@ -310,7 +314,6 @@ class AcmeClient {
      * @param {object} challenge Challenge object returned by API
      * @returns {Promise<object>} Challenge
      */
-
     async completeChallenge(challenge) {
         const data = {
             keyAuthorization: await this.getChallengeKeyAuthorization(challenge)
@@ -329,7 +332,6 @@ class AcmeClient {
      * @param {object} item An order, authorization or challenge object
      * @returns {Promise<object>} Valid order, authorization or challenge
      */
-
     async waitForValidStatus(item) {
         if (!item.url) {
             throw new Error('Unable to verify status of item, URL not found');

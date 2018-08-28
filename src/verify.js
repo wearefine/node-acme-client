@@ -70,6 +70,9 @@ async function verifyDnsChallenge(authz, challenge, keyAuthorization, prefix = '
     return true;
 }
 
+async function verifyTlsChallenge(authz, challenge, keyAuthorization, prefix){
+ return true
+}
 
 /*
  * Export API
@@ -77,5 +80,6 @@ async function verifyDnsChallenge(authz, challenge, keyAuthorization, prefix = '
 
 module.exports = {
     'http-01': verifyHttpChallenge,
-    'dns-01': verifyDnsChallenge
+    'dns-01': verifyDnsChallenge,
+    'tls-alpn-01': verifyTlsChallenge
 };
