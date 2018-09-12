@@ -3,7 +3,7 @@
     "description": "Simple and unopinionated ACME client",
     "author": "nmorsman",
     "version": "2.0.0",
-    "main": "lib/index.js",
+    "main": "src/index.js",
     "license": "MIT",
     "homepage": "https://github.com/publishlab/node-acme-client",
     "dependencies": {
